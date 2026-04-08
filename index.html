@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Gabarito Rascunho de Prova</title>
+<title>Simulador de Desempenho Pro</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -29,13 +29,13 @@
     --color-border-secondary: rgba(255,255,255,0.22);
   }
 }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--color-bg); color: var(--color-text-primary); padding: 2rem 1rem; max-width: 960px; margin: 0 auto; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--color-bg); color: var(--color-text-primary); padding: 2rem 1rem; max-width: 1100px; margin: 0 auto; }
 .step { display: none; }
 .step.active { display: block; }
-h2 { font-size: 18px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 1.5rem; }
+h2 { font-size: 18px; font-weight: 500; margin-bottom: 1.5rem; }
 .form-group { margin-bottom: 1.25rem; }
 label { font-size: 13px; color: var(--color-text-secondary); display: block; margin-bottom: 6px; }
-input[type="text"], input[type="number"], textarea {
+input, textarea {
   background: var(--color-bg);
   border: 0.5px solid var(--color-border-secondary);
   border-radius: var(--radius-md);
@@ -43,680 +43,421 @@ input[type="text"], input[type="number"], textarea {
   font-size: 14px;
   padding: 8px 12px;
   outline: none;
-  transition: border-color .15s;
-  font-family: inherit;
+  width: 100%;
 }
-input:focus, textarea:focus { border-color: #7F77DD; box-shadow: 0 0 0 3px rgba(127,119,221,0.15); }
-textarea { resize: vertical; }
-.radio-group { display: flex; gap: 12px; flex-wrap: wrap; }
-.radio-card { flex: 1; min-width: 160px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--radius-lg); padding: 1rem 1.25rem; cursor: pointer; transition: border-color .15s, background .15s; background: var(--color-bg); }
-.radio-card:hover { border-color: #7F77DD; }
-.radio-card.selected { border: 1.5px solid #7F77DD; background: #EEEDFE; }
-.radio-card.selected .rc-title { color: #3C3489; }
-.rc-title { font-weight: 500; font-size: 14px; color: var(--color-text-primary); margin-bottom: 2px; }
-.rc-sub { font-size: 12px; color: var(--color-text-secondary); }
-.btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 20px; border-radius: var(--radius-md); border: 0.5px solid var(--color-border-secondary); background: transparent; color: var(--color-text-primary); font-size: 14px; cursor: pointer; transition: background .15s; }
+
+/* Grid e Layout */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+
+.radio-group { display: flex; gap: 12px; }
+.radio-card { flex: 1; border: 0.5px solid var(--color-border-secondary); border-radius: var(--radius-lg); padding: 1rem; cursor: pointer; background: var(--color-bg); }
+.radio-card.selected { border: 2px solid #7F77DD; background: #EEEDFE; }
+.radio-card.selected strong { color: #3C3489; }
+
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 15px; border-radius: var(--radius-md); border: 0.5px solid var(--color-border-secondary); cursor: pointer; font-size: 13px; transition: 0.2s; background: var(--color-bg); color: var(--color-text-primary); }
 .btn:hover { background: var(--color-bg-secondary); }
-.btn-primary { background: #7F77DD; color: #fff; border-color: #7F77DD; font-weight: 500; }
-.btn-primary:hover { background: #534AB7; border-color: #534AB7; }
-.btn-success { background: #1D9E75; color: #fff; border-color: #1D9E75; }
-.btn-success:hover { background: #0F6E56; border-color: #0F6E56; }
-.btn-warn { background: #EF9F27; color: #fff; border-color: #EF9F27; }
-.btn-warn:hover { background: #BA7517; border-color: #BA7517; }
-.actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 1.5rem; }
-.card-resp { border: 0.5px solid var(--color-border); border-radius: var(--radius-lg); overflow: hidden; background: var(--color-bg); }
-.card-header { background: #EEEDFE; padding: .75rem 1.25rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
-.card-header-title { font-weight: 500; font-size: 14px; color: #3C3489; }
-.card-header-sub { font-size: 12px; color: #534AB7; }
-.questions-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 0; }
-.q-row { display: flex; align-items: center; gap: 10px; padding: 7px 1.25rem; border-bottom: 0.5px solid var(--color-border); transition: background .1s; cursor: default; }
-.q-row:last-child { border-bottom: none; }
+.btn.active-filter { background: #7F77DD; color: white; border-color: #7F77DD; }
+.btn-primary { background: #7F77DD; color: white; border: none; }
+.btn-success { background: #1D9E75; color: white; border: none; }
+
+.card-resp { border: 1px solid var(--color-border); border-radius: var(--radius-lg); overflow: hidden; margin-top: 1rem; background: var(--color-bg); }
+.card-header { background: #EEEDFE; padding: 1rem; display: flex; justify-content: space-between; align-items: center; }
+.card-header-title { color: #3C3489; font-weight: 600; font-size: 14px; }
+
+.questions-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+.q-row { display: flex; align-items: center; gap: 8px; padding: 8px 1rem; border-bottom: 0.5px solid var(--color-border); transition: 0.1s; }
 .q-row:hover { background: var(--color-bg-secondary); }
-.q-row.active-row { background: #EEEDFE; }
-.q-num { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); min-width: 28px; }
-.opt-btn { min-width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid var(--color-border-secondary); background: transparent; font-size: 13px; font-weight: 500; color: var(--color-text-primary); cursor: pointer; transition: all .12s; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.opt-btn:hover { border-color: #7F77DD; color: #534AB7; background: #EEEDFE; }
-.opt-btn.marked { background: #7F77DD; border-color: #7F77DD; color: #fff; }
-.opt-btn.correct { background: #1D9E75; border-color: #1D9E75; color: #fff; }
-.opt-btn.wrong { background: #E24B4A; border-color: #E24B4A; color: #fff; }
-.flag-btn { min-width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--color-border-secondary); background: transparent; font-size: 12px; cursor: pointer; transition: all .12s; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--color-text-secondary); }
-.flag-btn:hover { border-color: #EF9F27; color: #EF9F27; }
-.flag-btn.flagged { background: #FAEEDA; border-color: #EF9F27; color: #BA7517; }
-.q-status { width: 7px; height: 7px; border-radius: 50%; background: var(--color-border); flex-shrink: 0; }
-.q-status.filled { background: #7F77DD; }
-.q-status.flagged-s { background: #EF9F27; }
-.stats-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
-.stat-card { background: var(--color-bg-secondary); border-radius: var(--radius-md); padding: .75rem 1rem; }
-.stat-label { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px; }
-.stat-val { font-size: 22px; font-weight: 500; color: var(--color-text-primary); }
-.stat-val.green { color: #0F6E56; }
-.stat-val.red { color: #A32D2D; }
-.progress-wrap { height: 8px; background: var(--color-bg-secondary); border-radius: 99px; overflow: hidden; margin-bottom: 1.5rem; }
-.progress-fill { height: 100%; border-radius: 99px; background: #1D9E75; transition: width .6s cubic-bezier(.4,0,.2,1); width: 0%; }
-.tab-bar { display: flex; gap: 0; border-bottom: 0.5px solid var(--color-border); margin-bottom: 1.5rem; }
-.tab { padding: 8px 16px; font-size: 13px; color: var(--color-text-secondary); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color .15s; }
-.tab.active { color: #534AB7; border-bottom-color: #7F77DD; font-weight: 500; }
-.info-badge { display: inline-block; background: #EEEDFE; color: #534AB7; font-size: 11px; padding: 2px 8px; border-radius: var(--radius-md); margin-right: 4px; }
-.alert { padding: .75rem 1rem; border-radius: var(--radius-md); font-size: 13px; margin-bottom: 1rem; line-height: 1.6; }
-.alert-info { background: var(--color-bg-info); color: #185FA5; border: 0.5px solid #B5D4F4; }
-.alert-warn { background: #FAEEDA; color: #633806; border: 0.5px solid #FAC775; }
-.alert-success { background: #EAF3DE; color: #27500A; border: 0.5px solid #C0DD97; }
-.timer-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; background: var(--color-bg-secondary); border-radius: var(--radius-md); padding: 8px 14px; border: 0.5px solid var(--color-border); }
-.timer-display { font-size: 20px; font-weight: 500; font-variant-numeric: tabular-nums; color: var(--color-text-primary); letter-spacing: .04em; }
-.timer-label { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 2px; }
-.timer-spacer { flex: 1; }
-.timer-btn { padding: 5px 14px; font-size: 12px; }
-.kbd-hint { font-size: 11px; color: var(--color-text-secondary); margin-bottom: .75rem; line-height: 1.8; }
-.kbd { display: inline-block; background: var(--color-bg-secondary); border: 0.5px solid var(--color-border-secondary); border-radius: 4px; padding: 1px 5px; font-size: 11px; font-family: monospace; }
-.import-box { background: var(--color-bg-secondary); border-radius: var(--radius-lg); padding: 1rem 1.25rem; border: 0.5px solid var(--color-border); margin-bottom: 1rem; }
-.import-box h3 { font-size: 14px; font-weight: 500; margin-bottom: .4rem; color: var(--color-text-primary); }
-.import-box p { font-size: 12px; color: var(--color-text-secondary); margin-bottom: .75rem; line-height: 1.6; }
-.toggle-row { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; }
-.toggle { position: relative; width: 36px; height: 20px; flex-shrink: 0; }
-.toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
-.toggle-slider { position: absolute; inset: 0; background: var(--color-border-secondary); border-radius: 99px; cursor: pointer; transition: background .2s; }
-.toggle-slider:before { content: ''; position: absolute; width: 14px; height: 14px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: transform .2s; }
-.toggle input:checked + .toggle-slider { background: #7F77DD; }
-.toggle input:checked + .toggle-slider:before { transform: translateX(16px); }
-.toggle-label { font-size: 13px; color: var(--color-text-primary); }
-.resultado-layout { display: grid; grid-template-columns: 1fr auto; gap: 1.5rem; align-items: start; margin-bottom: 1.5rem; }
-@media (max-width: 600px) { .resultado-layout { grid-template-columns: 1fr; } }
-.chart-wrap { width: 160px; flex-shrink: 0; }
-@media (max-width: 600px) { .chart-wrap { width: 130px; margin: 0 auto; } }
-.duvidas-badge-top { display: inline-flex; align-items: center; gap: 4px; background: #FAEEDA; color: #854F0B; font-size: 11px; padding: 2px 8px; border-radius: var(--radius-md); }
-@media print {
-  .actions, .timer-bar, .kbd-hint, .tab-bar, #panel-gabarito, .import-box, .toggle-row { display: none !important; }
-  body { padding: .5rem; }
-}
+.active-row { background: #f0f0ff !important; box-shadow: inset 4px 0 0 #7F77DD; }
+
+.opt-btn { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--color-border-secondary); background: none; cursor: pointer; color: var(--color-text-primary); font-weight: 500; font-size: 12px; }
+.opt-btn.marked { background: #7F77DD; color: white; border-color: #7F77DD; }
+.opt-btn.correct { background: #1D9E75; color: white; border-color: #1D9E75; }
+.opt-btn.wrong { background: #E24B4A; color: white; border-color: #E24B4A; }
+
+.flag-btn { color: var(--color-text-secondary); transition: transform 0.2s, color 0.2s; opacity: 0.3; font-size: 18px; border: none; background: none; cursor: pointer; margin-left: auto; }
+.flag-btn.flagged { color: #EF9F27 !important; opacity: 1; transform: scale(1.2); }
+
+.materia-tag { font-size: 10px; padding: 2px 6px; background: var(--color-bg-secondary); border-radius: 4px; color: var(--color-text-secondary); max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.stats-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
+.stat-card { background: var(--color-bg-secondary); padding: 1rem; border-radius: var(--radius-md); text-align: center; }
+.stat-label { font-size: 11px; color: var(--color-text-secondary); text-transform: uppercase; margin-bottom: 5px; display: block; }
+.stat-val { font-size: 24px; font-weight: bold; }
+.green { color: #1D9E75; } .red { color: #E24B4A; }
+
+.matrix-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 13px; }
+.matrix-table th, .matrix-table td { padding: 10px; border: 1px solid var(--color-border); text-align: center; }
+.matrix-table th { background: var(--color-bg-secondary); font-weight: 600; }
+
+.timer-box { font-variant-numeric: tabular-nums; font-size: 1.5rem; font-weight: 600; }
+.kbd { background: #eee; padding: 2px 5px; border-radius: 4px; border: 1px solid #ccc; color: #333; font-size: 11px; margin: 0 2px; }
+
+@media print { .no-print { display: none !important; } }
 </style>
 </head>
 <body>
-<h2 id="step-title">Configurar gabarito</h2>
 
-<!-- STEP 1: CONFIG -->
-<div class="step active" id="step-config">
-  <div class="form-group">
-    <label>Tipo de prova</label>
-    <div class="radio-group">
-      <div class="radio-card selected" id="card-mc" onclick="selectTipo('multipla')">
-        <div class="rc-title">Múltipla escolha</div>
-        <div class="rc-sub">Opções A, B, C, D, E</div>
+<h2 id="step-title" class="no-print">Simulador de Provas Profissional</h2>
+
+<div class="step active no-print" id="step-config">
+  <div class="grid-2">
+    <div>
+      <div class="form-group">
+        <label>Tipo de Prova</label>
+        <div class="radio-group">
+          <div class="radio-card selected" id="card-mc" onclick="selectTipo('multipla')">
+            <strong>Múltipla Escolha</strong><br><small>A, B, C, D, E</small>
+          </div>
+          <div class="radio-card" id="card-ce" onclick="selectTipo('certo_errado')">
+            <strong>Certo / Errado</strong><br><small>Padrão CESPE</small>
+          </div>
+        </div>
       </div>
-      <div class="radio-card" id="card-ce" onclick="selectTipo('certo_errado')">
-        <div class="rc-title">Certo / Errado</div>
-        <div class="rc-sub">Padrão CESPE / CEBRASPE</div>
+      <div class="form-group">
+        <label>Quantidade de Questões</label>
+        <input type="number" id="qtd-input" value="20" min="1" max="200" style="width: 120px;">
+      </div>
+      <div class="form-group">
+        <label>Título da Prova</label>
+        <input type="text" id="titulo-input" placeholder="Ex: Simulado 01 - PC-SP">
+      </div>
+    </div>
+    <div>
+      <div class="form-group">
+        <label>Divisão por Disciplinas (Opcional)</label>
+        <textarea id="materias-input" style="height:120px;" placeholder="Ex:&#10;1-10 Português&#10;11-20 Direito Penal"></textarea>
       </div>
     </div>
   </div>
-  <div class="form-group">
-    <label for="qtd-input">Quantidade de questões</label>
-    <input type="number" id="qtd-input" value="20" min="1" max="200" style="width:120px;" />
-  </div>
-  <div class="form-group">
-    <label for="titulo-input">Título da prova (opcional)</label>
-    <input type="text" id="titulo-input" placeholder="Ex: Concurso INSS 2025" style="width:100%; max-width:400px;" />
-  </div>
-  <div id="restore-alert" style="display:none;" class="alert alert-success">
-    Existe um rascunho salvo. <a href="#" onclick="restaurarSalvo(); return false;" style="color:#27500A; font-weight:500; text-decoration:underline;">Restaurar sessão anterior →</a>
-  </div>
-  <div class="actions">
-    <button class="btn btn-primary" onclick="gerarCartao()">Gerar cartão resposta</button>
+  <div class="actions" style="margin-top: 20px;">
+    <button class="btn btn-primary" onclick="gerarCartao()">Iniciar Simulado</button>
   </div>
 </div>
 
-<!-- STEP 2: RASCUNHO -->
 <div class="step" id="step-rascunho">
-  <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:1rem;">
-    <span id="titulo-badge" class="info-badge"></span>
-    <span id="tipo-badge" class="info-badge"></span>
-    <span id="qtd-badge" class="info-badge"></span>
-    <span id="duvidas-badge" class="duvidas-badge-top" style="display:none;"></span>
-  </div>
-
-  <div class="timer-bar">
+  <div class="timer-bar no-print" style="display:flex; justify-content:space-between; align-items:center; background:var(--color-bg-secondary); padding:1rem; border-radius:12px; margin-bottom:1rem;">
     <div>
-      <div class="timer-label">Tempo decorrido</div>
-      <div class="timer-display" id="timer-display">00:00:00</div>
+      <div style="font-size:11px; color:var(--color-text-secondary); text-transform: uppercase;">Tempo Total</div>
+      <div id="timer-display" class="timer-box">00:00:00</div>
     </div>
-    <div class="timer-spacer"></div>
-    <button class="btn timer-btn" id="timer-toggle-btn" onclick="toggleTimer()">Pausar</button>
-    <button class="btn timer-btn" onclick="resetTimer()">Zerar</button>
+    <div id="materia-atual-display" style="font-weight:600; color:#7F77DD; font-size: 14px;"></div>
+    <button class="btn" onclick="toggleTimer()" id="timer-btn">Pausar</button>
   </div>
 
-  <div class="kbd-hint">
-    <span class="kbd">↑</span> <span class="kbd">↓</span> navegar &nbsp;·&nbsp;
-    <span class="kbd">A</span>–<span class="kbd">E</span> ou <span class="kbd">C</span>/<span class="kbd">E</span> marcar resposta &nbsp;·&nbsp;
-    <span class="kbd">1</span>–<span class="kbd">5</span> marcar por número &nbsp;·&nbsp;
-    <span class="kbd">F</span> flag de dúvida &nbsp;·&nbsp;
-    <span class="kbd">Del</span> desmarcar
+  <div class="no-print" style="margin-bottom:15px; font-size:12px; color:var(--color-text-secondary);">
+    ⌨️ <span class="kbd">↑</span><span class="kbd">↓</span> Navegar | <span class="kbd">A</span>-<span class="kbd">E</span> Marcar | <span class="kbd">F</span> Dúvida | <span class="kbd">Espaço</span> Ocultar Respostas
   </div>
 
   <div class="card-resp">
-    <div class="card-header">
-      <span class="card-header-title">Cartão resposta — rascunho</span>
-      <span class="card-header-sub" id="filled-count">0 respondidas</span>
+    <div class="card-header no-print">
+      <span class="card-header-title" id="display-titulo">Rascunho</span>
+      <span id="filled-count" style="font-size: 12px;">0/0 respondidas</span>
     </div>
     <div class="questions-grid" id="questions-grid"></div>
   </div>
 
-  <div class="actions">
+  <div class="actions no-print" style="margin-top:20px;">
     <button class="btn" onclick="voltarConfig()">← Voltar</button>
-    <button class="btn" onclick="limparRascunho()">Limpar tudo</button>
-    <button class="btn btn-primary" onclick="salvarRascunho()">Salvar rascunho →</button>
+    <button class="btn btn-primary" onclick="irParaGabarito()">Finalizar e Marcar Gabarito →</button>
   </div>
 </div>
 
-<!-- STEP 3: GABARITO + RESULTADO -->
 <div class="step" id="step-gabarito">
-  <div class="tab-bar">
-    <div class="tab active" id="tab-gabarito" onclick="switchTab('gabarito')">Informar gabarito</div>
-    <div class="tab" id="tab-resultado" onclick="switchTab('resultado')">Resultado</div>
+  <div class="tab-bar no-print" style="display:flex; border-bottom:1px solid var(--color-border); margin-bottom:1.5rem;">
+    <div class="tab active" id="tab-gab" onclick="switchTab('gab')" style="padding:10px 20px; cursor:pointer; font-size: 14px;">1. Informar Gabarito</div>
+    <div class="tab" id="tab-res" onclick="switchTab('res')" style="padding:10px 20px; cursor:pointer; font-size: 14px;">2. Resultado Final</div>
   </div>
 
-  <div id="panel-gabarito">
-    <div class="import-box">
-      <h3>Importar gabarito por texto</h3>
-      <p>Cole no formato <strong>1A 2B 3E</strong>, <strong>1-A, 2-B</strong> ou apenas as letras em sequência <strong>A B C D E</strong> (a partir da Q1). O sistema identifica automaticamente.</p>
-      <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:flex-end;">
-        <textarea id="import-text" rows="3" style="flex:1; min-width:200px;" placeholder="Ex: 1A 2B 3C 4D 5E&#10;ou: A B C D E (sequencial)"></textarea>
-        <button class="btn btn-primary" onclick="importarGabarito()">Importar</button>
+  <div id="panel-gabarito" class="no-print">
+    <div style="background:var(--color-bg-secondary); padding:1rem; border-radius:8px; margin-bottom:1.5rem;">
+      <label>Importação Rápida (Ex: ABCDE...)</label>
+      <input type="text" id="import-input" style="margin-bottom:10px;" placeholder="Cole aqui a sequência">
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <button class="btn" onclick="importarGabarito()">Aplicar Letras</button>
+        <label style="font-size: 13px;"><input type="checkbox" id="penalidade-cespe"> Penalidade CESPE</label>
       </div>
-      <div id="import-msg" style="font-size:12px; margin-top:6px; display:none;"></div>
     </div>
-
-    <div id="cespe-toggle-row" class="toggle-row" style="display:none;">
-      <label class="toggle"><input type="checkbox" id="penalidade-toggle" /><span class="toggle-slider"></span></label>
-      <span class="toggle-label">Aplicar penalidade CESPE — erro anula acerto (nota = acertos − erros)</span>
-    </div>
-
-    <div class="alert alert-info">Indique a resposta correta de cada questão. Você pode clicar uma a uma ou usar o importador acima.</div>
     <div class="card-resp">
-      <div class="card-header">
-        <span class="card-header-title">Gabarito oficial</span>
-        <span class="card-header-sub" id="gab-filled-count">0 informados</span>
-      </div>
-      <div class="questions-grid" id="gabarito-grid"></div>
+        <div class="questions-grid" id="gabarito-grid"></div>
     </div>
-    <div class="actions">
-      <button class="btn" onclick="voltarRascunho()">← Voltar ao rascunho</button>
-      <button class="btn btn-success" onclick="calcularResultado()">Calcular resultado →</button>
+    <div class="actions" style="margin-top:20px;">
+      <button class="btn btn-success" onclick="processarResultado()">Ver Relatório Final →</button>
     </div>
   </div>
 
   <div id="panel-resultado" style="display:none;">
-    <div class="resultado-layout">
-      <div>
-        <div class="stats-bar" id="stats-bar"></div>
-        <div class="progress-wrap"><div class="progress-fill" id="progress-fill"></div></div>
+    <div class="stats-bar" id="res-stats"></div>
+    
+    <div class="grid-2">
+      <div class="stat-card" style="background: var(--color-bg); border: 1px solid var(--color-border);">
+        <h4 style="font-size: 13px; margin-bottom: 15px;">Desempenho por Matéria</h4>
+        <div style="height: 180px;"><canvas id="chart-materias"></canvas></div>
       </div>
-      <div class="chart-wrap">
-        <canvas id="resultado-chart" width="160" height="160"></canvas>
+      <div class="stat-card" style="background: var(--color-bg); border: 1px solid var(--color-border);">
+        <h4 style="font-size: 13px; margin-bottom: 15px;">Matriz de Confiança</h4>
+        <table class="matrix-table">
+          <thead><tr><th>TIPO</th><th>ACERTOS</th><th>ERROS</th></tr></thead>
+          <tbody id="matrix-body"></tbody>
+        </table>
       </div>
     </div>
 
-    <div id="duvidas-result" class="alert alert-warn" style="display:none;"></div>
-
-    <div class="card-resp">
-      <div class="card-header">
-        <span class="card-header-title">Comparação questão a questão</span>
-        <span class="card-header-sub">verde = acerto · vermelho = erro · ⚑ = dúvida marcada</span>
-      </div>
-      <div class="questions-grid" id="resultado-grid"></div>
+    <div class="no-print" style="margin-top: 30px; display: flex; gap: 8px; align-items: center; background: var(--color-bg-secondary); padding: 10px; border-radius: 8px;">
+        <span style="font-size: 12px; font-weight: 600; margin-right: 5px;">FILTRAR REVISÃO:</span>
+        <button class="btn active-filter" onclick="filterResults('todas', this)" id="f-todas">Todas</button>
+        <button class="btn" onclick="filterResults('erros', this)" id="f-erros">Erros</button>
+        <button class="btn" onclick="filterResults('duvidas', this)" id="f-duvidas">Dúvidas ⚑</button>
+        <button class="btn" onclick="filterResults('acertos', this)" id="f-acertos">Acertos</button>
     </div>
-    <div class="actions">
-      <button class="btn" onclick="voltarGabarito()">← Editar gabarito</button>
-      <button class="btn btn-warn" onclick="window.print()">Imprimir / PDF</button>
-      <button class="btn btn-primary" onclick="novaProva()">Nova prova</button>
+
+    <div class="card-resp" style="margin-top:10px;">
+        <div class="questions-grid" id="resultado-grid"></div>
+    </div>
+    
+    <div class="actions no-print" style="margin-top:20px;">
+      <button class="btn" onclick="exportarCSV()">Exportar CSV</button>
+      <button class="btn btn-primary" onclick="location.reload()">Novo Simulado</button>
     </div>
   </div>
 </div>
 
 <script>
-var tipo = 'multipla';
-var qtd = 20;
-var respostas = {};
-var gabarito = {};
-var duvidas = {};
-var opcoes_mc = ['A','B','C','D','E'];
-var opcoes_ce = ['C','E'];
-var activeRow = 1;
-var timerSec = 0;
-var timerRunning = false;
-var timerInterval = null;
-var chartInstance = null;
+let tipo = 'multipla', qtd = 20, respostas = {}, gabarito = {}, materiasDef = [], timerSec = 0, timerInterval = null, activeRow = 1, hideAnswers = false, myChart = null;
 
-/* ── localStorage ── */
-function salvarLS() {
-  try {
-    localStorage.setItem('gab_state', JSON.stringify({
-      tipo: tipo, qtd: qtd, respostas: respostas,
-      gabarito: gabarito, duvidas: duvidas, timerSec: timerSec,
-      titulo: document.getElementById('titulo-input').value || ''
-    }));
-  } catch(e) {}
-}
-function carregarLS() {
-  try { var r = localStorage.getItem('gab_state'); return r ? JSON.parse(r) : null; }
-  catch(e) { return null; }
-}
-function limparLS() { try { localStorage.removeItem('gab_state'); } catch(e) {} }
-
-window.addEventListener('load', function() {
-  var saved = carregarLS();
-  if (saved && saved.respostas && Object.keys(saved.respostas).length > 0) {
-    document.getElementById('restore-alert').style.display = 'block';
-  }
-});
-
-function restaurarSalvo() {
-  var saved = carregarLS();
-  if (!saved) return;
-  tipo = saved.tipo || 'multipla';
-  qtd = saved.qtd || 20;
-  respostas = saved.respostas || {};
-  gabarito = saved.gabarito || {};
-  duvidas = saved.duvidas || {};
-  timerSec = saved.timerSec || 0;
-  document.getElementById('qtd-input').value = qtd;
-  document.getElementById('titulo-input').value = saved.titulo || '';
-  selectTipo(tipo);
-  abrirRascunho();
-}
-
-/* ── tipo ── */
 function selectTipo(t) {
-  tipo = t;
-  document.getElementById('card-mc').classList.toggle('selected', t === 'multipla');
-  document.getElementById('card-ce').classList.toggle('selected', t === 'certo_errado');
+    tipo = t;
+    document.querySelectorAll('.radio-card').forEach(c => c.classList.remove('selected'));
+    document.getElementById(t === 'multipla' ? 'card-mc' : 'card-ce').classList.add('selected');
 }
 
-/* ── gerar ── */
 function gerarCartao() {
-  qtd = parseInt(document.getElementById('qtd-input').value) || 20;
-  if (qtd < 1) qtd = 1;
-  if (qtd > 200) qtd = 200;
-  respostas = {}; gabarito = {}; duvidas = {};
-  timerSec = 0;
-  limparLS();
-  abrirRascunho();
-}
-
-function abrirRascunho() {
-  var titulo = document.getElementById('titulo-input').value || 'Prova';
-  document.getElementById('titulo-badge').textContent = titulo;
-  document.getElementById('tipo-badge').textContent = tipo === 'multipla' ? 'Múltipla escolha' : 'Certo / Errado';
-  document.getElementById('qtd-badge').textContent = qtd + ' questões';
-  document.getElementById('cespe-toggle-row').style.display = tipo === 'certo_errado' ? 'flex' : 'none';
-  renderGrid('questions-grid', respostas, 'rascunho');
-  updateFilledCount();
-  showStep('step-rascunho');
-  document.getElementById('step-title').textContent = 'Cartão resposta';
-  activeRow = 1;
-  highlightRow(activeRow);
-  iniciarTimer();
-}
-
-/* ── timer ── */
-function iniciarTimer() {
-  if (timerInterval) clearInterval(timerInterval);
-  timerRunning = true;
-  document.getElementById('timer-toggle-btn').textContent = 'Pausar';
-  atualizarTimer();
-  timerInterval = setInterval(function() {
-    if (timerRunning) {
-      timerSec++;
-      atualizarTimer();
-      if (timerSec % 15 === 0) salvarLS();
-    }
-  }, 1000);
-}
-function atualizarTimer() {
-  var h = Math.floor(timerSec / 3600);
-  var m = Math.floor((timerSec % 3600) / 60);
-  var s = timerSec % 60;
-  document.getElementById('timer-display').textContent = pad2(h) + ':' + pad2(m) + ':' + pad2(s);
-}
-function pad2(n) { return n < 10 ? '0' + n : '' + n; }
-function toggleTimer() {
-  timerRunning = !timerRunning;
-  document.getElementById('timer-toggle-btn').textContent = timerRunning ? 'Pausar' : 'Retomar';
-}
-function resetTimer() { timerSec = 0; atualizarTimer(); }
-function pararTimer() { if (timerInterval) { clearInterval(timerInterval); timerInterval = null; } timerRunning = false; }
-
-/* ── render grid ── */
-function renderGrid(containerId, data, mode) {
-  var opts = tipo === 'multipla' ? opcoes_mc : opcoes_ce;
-  var html = '';
-  for (var i = 1; i <= qtd; i++) {
-    var isActive = (mode === 'rascunho' && i === activeRow);
-    var flagged = !!duvidas[i];
-    html += '<div class="q-row' + (isActive ? ' active-row' : '') + '" id="row-' + mode + '-' + i + '" data-q="' + i + '" data-mode="' + mode + '">';
-    html += '<span class="q-num">Q' + i + '</span>';
-    for (var j = 0; j < opts.length; j++) {
-      var o = opts[j];
-      var cls = 'opt-btn' + (data[i] === o ? ' marked' : '');
-      html += '<button class="' + cls + '" onclick="marcar(\'' + mode + '\',' + i + ',\'' + o + '\')" id="btn-' + mode + '-' + i + '-' + o + '" tabindex="-1">' + o + '</button>';
-    }
-    if (mode === 'rascunho') {
-      html += '<button class="flag-btn' + (flagged ? ' flagged' : '') + '" onclick="toggleFlag(' + i + ')" title="Dúvida (F)" id="flag-' + i + '" tabindex="-1">⚑</button>';
-    }
-    var stCls = 'q-status' + (data[i] ? ' filled' : '') + (flagged && mode === 'rascunho' ? ' flagged-s' : '');
-    html += '<span class="' + stCls + '" id="status-' + mode + '-' + i + '"></span>';
-    html += '</div>';
-  }
-  document.getElementById(containerId).innerHTML = html;
-}
-
-/* ── marcar resposta ── */
-function marcar(mode, q, opcao) {
-  var data = mode === 'rascunho' ? respostas : gabarito;
-  if (data[q] === opcao) { delete data[q]; } else { data[q] = opcao; }
-  var opts = tipo === 'multipla' ? opcoes_mc : opcoes_ce;
-  for (var j = 0; j < opts.length; j++) {
-    var o = opts[j];
-    var btn = document.getElementById('btn-' + mode + '-' + q + '-' + o);
-    if (btn) btn.className = 'opt-btn' + (data[q] === o ? ' marked' : '');
-  }
-  atualizarStatus(mode, q);
-  if (mode === 'rascunho') { updateFilledCount(); salvarLS(); }
-  else updateGabFilledCount();
-}
-
-function atualizarStatus(mode, q) {
-  var data = mode === 'rascunho' ? respostas : gabarito;
-  var st = document.getElementById('status-' + mode + '-' + q);
-  if (st) st.className = 'q-status' + (data[q] ? ' filled' : '') + (duvidas[q] && mode === 'rascunho' ? ' flagged-s' : '');
-}
-
-/* ── flag dúvida ── */
-function toggleFlag(q) {
-  if (duvidas[q]) { delete duvidas[q]; } else { duvidas[q] = true; }
-  var btn = document.getElementById('flag-' + q);
-  if (btn) btn.className = 'flag-btn' + (duvidas[q] ? ' flagged' : '');
-  atualizarStatus('rascunho', q);
-  updateFilledCount();
-  salvarLS();
-}
-
-/* ── teclado ── */
-document.addEventListener('keydown', function(e) {
-  if (!document.getElementById('step-rascunho').classList.contains('active')) return;
-  var tag = (e.target.tagName || '').toLowerCase();
-  if (tag === 'input' || tag === 'textarea' || tag === 'button') return;
-
-  var opts = tipo === 'multipla' ? opcoes_mc : opcoes_ce;
-  var key = e.key.toUpperCase();
-
-  if (e.key === 'ArrowDown' || (e.key === 'Tab' && !e.shiftKey)) {
-    e.preventDefault();
-    if (activeRow < qtd) { activeRow++; highlightRow(activeRow); }
-  } else if (e.key === 'ArrowUp' || (e.key === 'Tab' && e.shiftKey)) {
-    e.preventDefault();
-    if (activeRow > 1) { activeRow--; highlightRow(activeRow); }
-  } else if (e.key === 'Delete' || e.key === 'Backspace') {
-    if (respostas[activeRow]) { delete respostas[activeRow]; refreshRowBtns(activeRow); updateFilledCount(); salvarLS(); }
-  } else if (key === 'F') {
-    e.preventDefault();
-    toggleFlag(activeRow);
-  } else if (opts.indexOf(key) !== -1) {
-    marcar('rascunho', activeRow, key);
-    if (activeRow < qtd) { activeRow++; highlightRow(activeRow); }
-  } else {
-    var num = parseInt(e.key);
-    if (!isNaN(num) && num >= 1 && num <= opts.length) {
-      marcar('rascunho', activeRow, opts[num - 1]);
-      if (activeRow < qtd) { activeRow++; highlightRow(activeRow); }
-    }
-  }
-});
-
-document.addEventListener('click', function(e) {
-  var row = e.target.closest('#questions-grid .q-row');
-  if (row && row.dataset.mode === 'rascunho') {
-    activeRow = parseInt(row.dataset.q);
-    highlightRow(activeRow);
-  }
-});
-
-function highlightRow(q) {
-  document.querySelectorAll('#questions-grid .q-row').forEach(function(r) { r.classList.remove('active-row'); });
-  var row = document.getElementById('row-rascunho-' + q);
-  if (row) { row.classList.add('active-row'); row.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
-}
-
-function refreshRowBtns(q) {
-  var opts = tipo === 'multipla' ? opcoes_mc : opcoes_ce;
-  for (var j = 0; j < opts.length; j++) {
-    var btn = document.getElementById('btn-rascunho-' + q + '-' + opts[j]);
-    if (btn) btn.className = 'opt-btn' + (respostas[q] === opts[j] ? ' marked' : '');
-  }
-  atualizarStatus('rascunho', q);
-}
-
-/* ── counts ── */
-function updateFilledCount() {
-  var c = Object.keys(respostas).length;
-  var d = Object.keys(duvidas).length;
-  document.getElementById('filled-count').textContent = c + ' respondidas';
-  var db = document.getElementById('duvidas-badge');
-  if (d > 0) { db.style.display = 'inline-flex'; db.textContent = '⚑ ' + d + ' dúvida' + (d > 1 ? 's' : ''); }
-  else db.style.display = 'none';
-}
-function updateGabFilledCount() {
-  document.getElementById('gab-filled-count').textContent = Object.keys(gabarito).length + ' informados';
-}
-
-/* ── limpar ── */
-function limparRascunho() {
-  respostas = {}; duvidas = {};
-  renderGrid('questions-grid', respostas, 'rascunho');
-  updateFilledCount(); salvarLS();
-}
-
-/* ── salvar rascunho ── */
-function salvarRascunho() {
-  pararTimer();
-  renderGrid('gabarito-grid', gabarito, 'gabarito');
-  updateGabFilledCount();
-  showStep('step-gabarito');
-  document.getElementById('step-title').textContent = 'Gabarito e resultado';
-  switchTab('gabarito');
-  document.getElementById('panel-resultado').style.display = 'none';
-  salvarLS();
-}
-
-/* ── voltar rascunho ── */
-function voltarRascunho() {
-  renderGrid('questions-grid', respostas, 'rascunho');
-  updateFilledCount();
-  showStep('step-rascunho');
-  document.getElementById('step-title').textContent = 'Cartão resposta';
-  activeRow = 1; highlightRow(activeRow);
-  iniciarTimer();
-}
-
-/* ── importar gabarito ── */
-function importarGabarito() {
-  var txt = document.getElementById('import-text').value.trim();
-  var msg = document.getElementById('import-msg');
-  if (!txt) { exibirMsg(msg, 'Digite o gabarito para importar.', false); return; }
-  var opts = tipo === 'multipla' ? opcoes_mc : opcoes_ce;
-  var imported = 0;
-  var pairs = txt.match(/\d+\s*[-:]?\s*[a-eA-ECcEe]/g);
-  if (pairs && pairs.length > 0) {
-    pairs.forEach(function(p) {
-      var m = p.match(/(\d+)\s*[-:]?\s*([a-eA-ECcEe])/);
-      if (m) {
-        var q = parseInt(m[1]); var r = m[2].toUpperCase();
-        if (q >= 1 && q <= qtd && opts.indexOf(r) !== -1) { gabarito[q] = r; imported++; }
-      }
+    qtd = parseInt(document.getElementById('qtd-input').value);
+    const materiasRaw = document.getElementById('materias-input').value.split('\n');
+    materiasDef = [];
+    materiasRaw.forEach(line => {
+        const match = line.match(/(\d+)-(\d+)\s+(.+)/);
+        if (match) materiasDef.push({ de: parseInt(match[1]), ate: parseInt(match[2]), nome: match[3] });
     });
-  } else {
-    var tokens = txt.split(/[\s,;]+/).filter(Boolean);
-    for (var i = 0; i < tokens.length && i < qtd; i++) {
-      var r = tokens[i].toUpperCase();
-      if (opts.indexOf(r) !== -1) { gabarito[i + 1] = r; imported++; }
+
+    respostas = {};
+    for(let i=1; i<=qtd; i++) {
+        const mat = materiasDef.find(m => i >= m.de && i <= m.ate);
+        respostas[i] = { opcao: null, tempo: 0, materia: mat ? mat.nome : 'Geral', duvida: false };
     }
-  }
-  renderGrid('gabarito-grid', gabarito, 'gabarito');
-  updateGabFilledCount();
-  exibirMsg(msg, imported + ' questões importadas com sucesso.', true);
-}
-function exibirMsg(el, txt, ok) {
-  el.style.display = 'block';
-  el.style.color = ok ? '#0F6E56' : '#A32D2D';
-  el.textContent = txt;
-  setTimeout(function() { el.style.display = 'none'; }, 4000);
+    document.getElementById('display-titulo').textContent = document.getElementById('titulo-input').value || 'Simulado';
+    renderGrid('questions-grid', 'rascunho');
+    showStep('step-rascunho');
+    startTimer();
+    highlightRow('rascunho');
 }
 
-/* ── tabs ── */
-function switchTab(t) {
-  document.getElementById('tab-gabarito').className = 'tab' + (t === 'gabarito' ? ' active' : '');
-  document.getElementById('tab-resultado').className = 'tab' + (t === 'resultado' ? ' active' : '');
-  document.getElementById('panel-gabarito').style.display = t === 'gabarito' ? 'block' : 'none';
-  document.getElementById('panel-resultado').style.display = t === 'resultado' ? 'block' : 'none';
-}
+function renderGrid(containerId, mode) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+    const opts = tipo === 'multipla' ? ['A','B','C','D','E'] : ['C','E'];
 
-/* ── calcular resultado ── */
-function calcularResultado() {
-  var acertos = 0, erros = 0, naoResp = 0, duvidaAcertos = 0, duvidaErros = 0;
-  var penalidade = tipo === 'certo_errado' && document.getElementById('penalidade-toggle').checked;
-  var opts = tipo === 'multipla' ? opcoes_mc : opcoes_ce;
-  var html = '';
+    for (let i = 1; i <= qtd; i++) {
+        const row = document.createElement('div');
+        row.className = `q-row ${i === activeRow && mode === 'rascunho' ? 'active-row' : ''}`;
+        row.id = `row-${mode}-${i}`;
+        row.onclick = (e) => { if(e.target.tagName !== 'BUTTON') { activeRow = i; highlightRow(mode); } };
 
-  for (var i = 1; i <= qtd; i++) {
-    var resp = respostas[i];
-    var gab = gabarito[i];
-    var flagged = !!duvidas[i];
-    html += '<div class="q-row"><span class="q-num">Q' + i + '</span>';
-    for (var j = 0; j < opts.length; j++) {
-      var o = opts[j];
-      var cls = 'opt-btn';
-      if (gab === o && resp === o) cls += ' correct';
-      else if (gab === o && resp !== o) cls += ' correct';
-      else if (resp === o && gab && resp !== gab) cls += ' wrong';
-      else if (resp === o && !gab) cls += ' marked';
-      html += '<button class="' + cls + '" disabled>' + o + '</button>';
+        let html = `<span class="q-num">Q${i}</span>`;
+        html += `<span class="materia-tag">${respostas[i].materia}</span>`;
+        
+        opts.forEach(opt => {
+            let isSelected = (mode === 'rascunho' ? respostas[i].opcao : gabarito[i]) === opt;
+            let displayClass = (isSelected && (!hideAnswers || mode !== 'rascunho')) ? 'marked' : '';
+            html += `<button class="opt-btn ${displayClass}" onclick="marcar('${mode}', ${i}, '${opt}')">${opt}</button>`;
+        });
+
+        if (mode === 'rascunho') {
+            const flaggedClass = respostas[i].duvida ? 'flagged' : '';
+            html += `<button class="flag-btn ${flaggedClass}" onclick="toggleDuvida(event, ${i})">⚑</button>`;
+        }
+        row.innerHTML = html;
+        container.appendChild(row);
     }
-    var icon = '';
-    if (!resp) {
-      naoResp++;
-      icon = '<span style="font-size:11px;color:var(--color-text-secondary);margin-left:4px;">—</span>';
-    } else if (!gab) {
-      icon = '<span style="font-size:11px;color:var(--color-text-secondary);margin-left:4px;">?</span>';
-    } else if (resp === gab) {
-      acertos++;
-      if (flagged) duvidaAcertos++;
-      icon = '<span style="font-size:13px;color:#1D9E75;margin-left:4px;">✓</span>';
+}
+
+function marcar(mode, q, opt) {
+    if (mode === 'rascunho') {
+        respostas[q].opcao = (respostas[q].opcao === opt) ? null : opt;
+        respostas[q].tempo = timerSec;
+        updateStatus();
     } else {
-      erros++;
-      if (flagged) duvidaErros++;
-      icon = '<span style="font-size:13px;color:#E24B4A;margin-left:4px;">✗</span>';
+        gabarito[q] = (gabarito[q] === opt) ? null : opt;
     }
-    if (flagged) icon += '<span style="font-size:11px;color:#BA7517;margin-left:3px;" title="Questão marcada com dúvida">⚑</span>';
-    html += icon + '</div>';
-  }
-  document.getElementById('resultado-grid').innerHTML = html;
-
-  var gabInformados = Object.keys(gabarito).length;
-  var nota = penalidade ? acertos - erros : acertos;
-  var pctAcerto = gabInformados > 0 ? Math.round((acertos / gabInformados) * 100) : 0;
-
-  var statsHtml =
-    '<div class="stat-card"><div class="stat-label">Acertos</div><div class="stat-val green" id="sv-acertos">0</div></div>' +
-    '<div class="stat-card"><div class="stat-label">Erros</div><div class="stat-val red" id="sv-erros">0</div></div>' +
-    '<div class="stat-card"><div class="stat-label">Em branco</div><div class="stat-val" id="sv-branco">0</div></div>' +
-    (penalidade ? '<div class="stat-card"><div class="stat-label">Nota líquida</div><div class="stat-val ' + (nota >= 0 ? 'green' : 'red') + '" id="sv-nota">0</div></div>' : '') +
-    '<div class="stat-card"><div class="stat-label">Aproveitamento</div><div class="stat-val ' + (pctAcerto >= 60 ? 'green' : 'red') + '" id="sv-pct">0%</div></div>';
-  document.getElementById('stats-bar').innerHTML = statsHtml;
-
-  animarContador('sv-acertos', acertos, '');
-  animarContador('sv-erros', erros, '');
-  animarContador('sv-branco', naoResp, '');
-  if (penalidade) animarContador('sv-nota', nota, '');
-  animarContador('sv-pct', pctAcerto, '%');
-
-  document.getElementById('progress-fill').style.width = pctAcerto + '%';
-  document.getElementById('progress-fill').style.background = pctAcerto >= 60 ? '#1D9E75' : '#E24B4A';
-
-  var duv = Object.keys(duvidas).length;
-  var dr = document.getElementById('duvidas-result');
-  if (duv > 0) {
-    dr.style.display = 'block';
-    dr.innerHTML = '⚑ Você marcou <strong>' + duv + '</strong> questão(ões) com dúvida: acertou <strong>' + duvidaAcertos + '</strong> e errou <strong>' + duvidaErros + '</strong>.';
-  } else { dr.style.display = 'none'; }
-
-  renderChart(acertos, erros, naoResp);
-  switchTab('resultado');
+    renderGrid(mode === 'rascunho' ? 'questions-grid' : 'gabarito-grid', mode);
 }
 
-/* ── animação contadora ── */
-function animarContador(id, target, suffix) {
-  var el = document.getElementById(id);
-  if (!el) return;
-  var dir = target >= 0 ? 1 : -1;
-  var steps = 20;
-  var step = 0;
-  var iv = setInterval(function() {
-    step++;
-    var cur = Math.round((target * step) / steps);
-    el.textContent = cur + suffix;
-    if (step >= steps) { el.textContent = target + suffix; clearInterval(iv); }
-  }, 30);
+function toggleDuvida(event, q) {
+    if (event) event.stopPropagation();
+    respostas[q].duvida = !respostas[q].duvida;
+    renderGrid('questions-grid', 'rascunho');
 }
 
-/* ── Chart.js ── */
-function renderChart(acertos, erros, branco) {
-  var canvas = document.getElementById('resultado-chart');
-  if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
-  var isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  chartInstance = new Chart(canvas, {
-    type: 'doughnut',
-    data: {
-      labels: ['Acertos', 'Erros', 'Em branco'],
-      datasets: [{
-        data: [acertos, erros, branco],
-        backgroundColor: ['#1D9E75', '#E24B4A', isDark ? '#444441' : '#D3D1C7'],
-        borderWidth: 0,
-        hoverOffset: 4
-      }]
-    },
-    options: {
-      responsive: false,
-      cutout: '68%',
-      plugins: {
-        legend: {
-          display: true,
-          position: 'bottom',
-          labels: { color: isDark ? '#f0ede8' : '#1a1a18', font: { size: 11 }, boxWidth: 10, padding: 8 }
+function highlightRow(mode) {
+    document.querySelectorAll('.q-row').forEach(r => r.classList.remove('active-row'));
+    const row = document.getElementById(`row-${mode}-${activeRow}`);
+    if (row) {
+        row.classList.add('active-row');
+        document.getElementById('materia-atual-display').textContent = respostas[activeRow].materia;
+    }
+}
+
+function startTimer() {
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+        timerSec++;
+        const h = Math.floor(timerSec / 3600), m = Math.floor((timerSec % 3600) / 60), s = timerSec % 60;
+        document.getElementById('timer-display').textContent = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+    }, 1000);
+}
+
+function toggleTimer() {
+    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; document.getElementById('timer-btn').textContent = 'Retomar'; }
+    else { startTimer(); document.getElementById('timer-btn').textContent = 'Pausar'; }
+}
+
+function processarResultado() {
+    const container = document.getElementById('resultado-grid');
+    container.innerHTML = '';
+    let stats = { acertos: 0, erros: 0, branco: 0, chuteA: 0, chuteE: 0, consA: 0, consE: 0 };
+    let matStats = {};
+
+    for (let i = 1; i <= qtd; i++) {
+        const resp = respostas[i].opcao, gab = gabarito[i], m = respostas[i].materia;
+        if (!matStats[m]) matStats[m] = { a: 0, total: 0 };
+        if (gab) matStats[m].total++;
+
+        const isCorrect = resp === gab;
+        const isError = resp && resp !== gab;
+
+        if (!resp) stats.branco++;
+        else if (isCorrect) { 
+            stats.acertos++; matStats[m].a++; 
+            respostas[i].duvida ? stats.chuteA++ : stats.consA++;
+        } else { 
+            stats.erros++; 
+            respostas[i].duvida ? stats.chuteE++ : stats.consE++;
+        }
+
+        const row = document.createElement('div');
+        row.className = 'q-row';
+        // Atributos para filtro
+        row.dataset.result = isCorrect ? 'acerto' : (isError ? 'erro' : 'branco');
+        row.dataset.duvida = respostas[i].duvida ? 'sim' : 'nao';
+
+        let html = `<span>Q${i}</span><span class="materia-tag">${m}</span>`;
+        const opts = tipo === 'multipla' ? ['A','B','C','D','E'] : ['C','E'];
+        opts.forEach(o => {
+            let cls = (o === gab) ? 'correct' : (o === resp ? 'wrong' : '');
+            html += `<button class="opt-btn ${cls}" disabled>${o}</button>`;
+        });
+        html += respostas[i].duvida ? '<span style="color:#EF9F27; margin-left:10px;">⚑</span>' : '';
+        row.innerHTML = html; container.appendChild(row);
+    }
+
+    const penalidade = document.getElementById('penalidade-cespe').checked;
+    const nota = penalidade ? stats.acertos - stats.erros : stats.acertos;
+    const aprov = Math.round((stats.acertos / (Object.keys(gabarito).length || qtd)) * 100);
+
+    document.getElementById('res-stats').innerHTML = `
+        <div class="stat-card"><span class="stat-label">Acertos</span><span class="stat-val green">${stats.acertos}</span></div>
+        <div class="stat-card"><span class="stat-label">Erros</span><span class="stat-val red">${stats.erros}</span></div>
+        <div class="stat-card"><span class="stat-label">Nota Líquida</span><span class="stat-val">${nota}</span></div>
+        <div class="stat-card"><span class="stat-label">Aproveitamento</span><span class="stat-val">${aprov}%</span></div>
+    `;
+
+    document.getElementById('matrix-body').innerHTML = `
+        <tr><td style="text-align:left">Consciente</td><td class="green">${stats.consA}</td><td class="red">${stats.consE}</td></tr>
+        <tr><td style="text-align:left">Chute (⚑)</td><td class="green">${stats.chuteA}</td><td class="red">${stats.chuteE}</td></tr>
+    `;
+
+    // Atualizar labels dos filtros
+    document.getElementById('f-todas').textContent = `Todas (${qtd})`;
+    document.getElementById('f-erros').textContent = `Erros (${stats.erros})`;
+    document.getElementById('f-duvidas').textContent = `Dúvidas (${Object.values(respostas).filter(r=>r.duvida).length})`;
+    document.getElementById('f-acertos').textContent = `Acertos (${stats.acertos})`;
+
+    renderMateriaChart(matStats);
+    switchTab('res');
+}
+
+// LOGICA DE FILTRO
+function filterResults(type, btn) {
+    const rows = document.querySelectorAll('#resultado-grid .q-row');
+    document.querySelectorAll('.no-print .btn').forEach(b => b.classList.remove('active-filter'));
+    btn.classList.add('active-filter');
+
+    rows.forEach(row => {
+        row.style.display = 'flex';
+        if (type === 'erros' && row.dataset.result !== 'erro') row.style.display = 'none';
+        if (type === 'acertos' && row.dataset.result !== 'acerto') row.style.display = 'none';
+        if (type === 'duvidas' && row.dataset.duvida !== 'sim') row.style.display = 'none';
+    });
+}
+
+function renderMateriaChart(data) {
+    const ctx = document.getElementById('chart-materias').getContext('2d');
+    if (myChart) myChart.destroy();
+    myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: Object.keys(data),
+            datasets: [{ label: '% Acerto', data: Object.values(data).map(v => (v.a / (v.total || 1) * 100).toFixed(1)), backgroundColor: '#7F77DD', borderRadius: 4 }]
         },
-        tooltip: { callbacks: { label: function(ctx) { return ' ' + ctx.label + ': ' + ctx.parsed; } } }
-      },
-      animation: { duration: 700 }
-    }
-  });
+        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x: { max: 100, min: 0 } }, plugins: { legend: { display: false } } }
+    });
 }
 
-/* ── navegação ── */
-function voltarGabarito() { switchTab('gabarito'); }
-function voltarConfig() {
-  pararTimer();
-  showStep('step-config');
-  document.getElementById('step-title').textContent = 'Configurar gabarito';
-  var saved = carregarLS();
-  document.getElementById('restore-alert').style.display =
-    (saved && Object.keys(saved.respostas || {}).length > 0) ? 'block' : 'none';
-}
-function novaProva() {
-  limparLS();
-  respostas = {}; gabarito = {}; duvidas = {}; timerSec = 0;
-  voltarConfig();
-}
 function showStep(id) {
-  document.querySelectorAll('.step').forEach(function(s) { s.classList.remove('active'); });
-  document.getElementById(id).classList.add('active');
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
 }
+
+function switchTab(t) {
+    document.getElementById('panel-gabarito').style.display = t === 'gab' ? 'block' : 'none';
+    document.getElementById('panel-resultado').style.display = t === 'res' ? 'block' : 'none';
+    document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+    document.getElementById('tab-' + t).classList.add('active');
+}
+
+function irParaGabarito() { clearInterval(timerInterval); renderGrid('gabarito-grid', 'gabarito'); showStep('step-gabarito'); }
+
+function importarGabarito() {
+    const val = document.getElementById('import-input').value.toUpperCase().replace(/\s/g, '');
+    for(let i=0; i<val.length; i++) if(i < qtd) gabarito[i+1] = val[i];
+    renderGrid('gabarito-grid', 'gabarito');
+}
+
+function exportarCSV() {
+    let csv = "Questao;Materia;Resposta;Gabarito;Duvida;Tempo_Segundos\n";
+    for(let i=1; i<=qtd; i++) csv += `${i};${respostas[i].materia};${respostas[i].opcao || ""};${gabarito[i] || ""};${respostas[i].duvida};${respostas[i].tempo}\n`;
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'resultado.csv'; a.click();
+}
+
+window.onkeydown = (e) => {
+    if (!document.getElementById('step-rascunho').classList.contains('active')) return;
+    const tag = e.target.tagName.toLowerCase();
+    if (tag === 'input' || tag === 'textarea') return;
+    if (e.key >= 'a' && e.key <= 'e') marcar('rascunho', activeRow, e.key.toUpperCase());
+    if (e.key === 'ArrowDown' && activeRow < qtd) { activeRow++; highlightRow('rascunho'); }
+    if (e.key === 'ArrowUp' && activeRow > 1) { activeRow--; highlightRow('rascunho'); }
+    if (e.key === 'f') toggleDuvida(null, activeRow);
+    if (e.code === 'Space') { e.preventDefault(); hideAnswers = !hideAnswers; renderGrid('questions-grid', 'rascunho'); }
+};
+
+function updateStatus() {
+    const resp = Object.values(respostas).filter(r => r.opcao).length;
+    document.getElementById('filled-count').textContent = `${resp}/${qtd} respondidas`;
+}
+
+function voltarConfig() { clearInterval(timerInterval); showStep('step-config'); }
 </script>
 </body>
 </html>
