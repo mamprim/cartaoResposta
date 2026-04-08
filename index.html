@@ -1,0 +1,298 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); }
+.wrap { padding: 1.5rem 0; }
+.step { display: none; }
+.step.active { display: block; }
+h2 { font-size: 18px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 1.5rem; }
+.form-group { margin-bottom: 1.25rem; }
+label { font-size: 13px; color: var(--color-text-secondary); display: block; margin-bottom: 6px; }
+.radio-group { display: flex; gap: 12px; flex-wrap: wrap; }
+.radio-card { flex: 1; min-width: 160px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; cursor: pointer; transition: border-color .15s, background .15s; background: var(--color-background-primary); }
+.radio-card:hover { border-color: var(--color-border-primary); }
+.radio-card.selected { border: 1.5px solid #7F77DD; background: #EEEDFE; }
+.radio-card.selected .rc-title { color: #3C3489; }
+.rc-title { font-weight: 500; font-size: 14px; color: var(--color-text-primary); margin-bottom: 2px; }
+.rc-sub { font-size: 12px; color: var(--color-text-secondary); }
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 20px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: transparent; color: var(--color-text-primary); font-size: 14px; cursor: pointer; transition: background .15s; }
+.btn:hover { background: var(--color-background-secondary); }
+.btn-primary { background: #7F77DD; color: #fff; border-color: #7F77DD; font-weight: 500; }
+.btn-primary:hover { background: #534AB7; border-color: #534AB7; }
+.btn-danger { background: transparent; color: #A32D2D; border-color: #F09595; }
+.btn-danger:hover { background: #FCEBEB; }
+.btn-success { background: #1D9E75; color: #fff; border-color: #1D9E75; }
+.btn-success:hover { background: #0F6E56; border-color: #0F6E56; }
+.actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 1.5rem; }
+.card-resp { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; background: var(--color-background-primary); }
+.card-header { background: #EEEDFE; padding: .75rem 1.25rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+.card-header-title { font-weight: 500; font-size: 14px; color: #3C3489; }
+.card-header-sub { font-size: 12px; color: #534AB7; }
+.questions-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0; }
+.q-row { display: flex; align-items: center; gap: 12px; padding: 8px 1.25rem; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.q-row:last-child { border-bottom: none; }
+.q-num { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); min-width: 28px; }
+.opt-btn { min-width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid var(--color-border-secondary); background: transparent; font-size: 13px; font-weight: 500; color: var(--color-text-primary); cursor: pointer; transition: all .12s; display: flex; align-items: center; justify-content: center; }
+.opt-btn:hover { border-color: #7F77DD; color: #534AB7; }
+.opt-btn.marked { background: #7F77DD; border-color: #7F77DD; color: #fff; }
+.opt-btn.correct { background: #1D9E75; border-color: #1D9E75; color: #fff; }
+.opt-btn.wrong { background: #E24B4A; border-color: #E24B4A; color: #fff; }
+.opt-btn.gabarito-mark { box-shadow: 0 0 0 2px #1D9E75; }
+.legend { font-size: 11px; color: var(--color-text-secondary); }
+.stats-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
+.stat-card { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: .75rem 1rem; }
+.stat-label { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px; }
+.stat-val { font-size: 22px; font-weight: 500; color: var(--color-text-primary); }
+.stat-val.green { color: #0F6E56; }
+.stat-val.red { color: #A32D2D; }
+.progress-wrap { height: 8px; background: var(--color-background-secondary); border-radius: 99px; overflow: hidden; margin-bottom: 1.5rem; }
+.progress-fill { height: 100%; border-radius: 99px; background: #1D9E75; transition: width .5s ease; }
+.tab-bar { display: flex; gap: 0; border-bottom: 0.5px solid var(--color-border-tertiary); margin-bottom: 1.5rem; }
+.tab { padding: 8px 16px; font-size: 13px; color: var(--color-text-secondary); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.tab.active { color: #534AB7; border-bottom-color: #7F77DD; font-weight: 500; }
+.info-badge { display: inline-block; background: #EEEDFE; color: #534AB7; font-size: 11px; padding: 2px 8px; border-radius: var(--border-radius-md); margin-left: 8px; }
+.alert { padding: .75rem 1rem; border-radius: var(--border-radius-md); font-size: 13px; margin-bottom: 1rem; }
+.alert-info { background: #E6F1FB; color: #185FA5; border: 0.5px solid #B5D4F4; }
+.q-status { width: 8px; height: 8px; border-radius: 50%; background: var(--color-border-secondary); margin-left: auto; flex-shrink: 0; }
+.q-status.filled { background: #7F77DD; }
+</style>
+
+<div class="wrap">
+  <h2 id="step-title">Configurar gabarito</h2>
+
+  <div class="step active" id="step-config">
+    <div class="form-group">
+      <label>Tipo de prova</label>
+      <div class="radio-group">
+        <div class="radio-card selected" id="card-mc" onclick="selectTipo('multipla')">
+          <div class="rc-title">Múltipla escolha</div>
+          <div class="rc-sub">Opções A, B, C, D, E</div>
+        </div>
+        <div class="radio-card" id="card-ce" onclick="selectTipo('certo_errado')">
+          <div class="rc-title">Certo / Errado</div>
+          <div class="rc-sub">Padrão CESPE / CEBRASPE</div>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="qtd-input">Quantidade de questões</label>
+      <input type="number" id="qtd-input" value="20" min="1" max="200" style="width:120px;" />
+    </div>
+    <div class="form-group">
+      <label for="titulo-input">Título da prova (opcional)</label>
+      <input type="text" id="titulo-input" placeholder="Ex: Concurso INSS 2025" style="width:100%; max-width:400px;" />
+    </div>
+    <div class="actions">
+      <button class="btn btn-primary" onclick="gerarCartao()">Gerar cartão resposta</button>
+    </div>
+  </div>
+
+  <div class="step" id="step-rascunho">
+    <div id="rascunho-header" style="margin-bottom:1rem; display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+      <span id="titulo-badge" class="info-badge"></span>
+      <span id="tipo-badge" class="info-badge"></span>
+      <span id="qtd-badge" class="info-badge"></span>
+    </div>
+    <div class="alert alert-info">Selecione sua resposta para cada questão. Clique em "Salvar rascunho" quando terminar.</div>
+    <div class="card-resp">
+      <div class="card-header">
+        <span class="card-header-title">Cartão resposta — rascunho</span>
+        <span class="card-header-sub" id="filled-count">0 respondidas</span>
+      </div>
+      <div class="questions-grid" id="questions-grid"></div>
+    </div>
+    <div class="actions">
+      <button class="btn" onclick="voltarConfig()">← Voltar</button>
+      <button class="btn" onclick="limparRascunho()">Limpar tudo</button>
+      <button class="btn btn-primary" onclick="salvarRascunho()">Salvar rascunho →</button>
+    </div>
+  </div>
+
+  <div class="step" id="step-gabarito">
+    <div class="tab-bar">
+      <div class="tab active" id="tab-gabarito" onclick="switchTab('gabarito')">Informar gabarito</div>
+      <div class="tab" id="tab-resultado" onclick="switchTab('resultado')">Resultado</div>
+    </div>
+
+    <div id="panel-gabarito">
+      <div class="alert alert-info">Indique a resposta correta de cada questão para calcular seu desempenho.</div>
+      <div class="card-resp">
+        <div class="card-header">
+          <span class="card-header-title">Gabarito oficial</span>
+          <span class="card-header-sub" id="gab-filled-count">0 informados</span>
+        </div>
+        <div class="questions-grid" id="gabarito-grid"></div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-success" onclick="calcularResultado()">Calcular resultado →</button>
+      </div>
+    </div>
+
+    <div id="panel-resultado" style="display:none;">
+      <div class="stats-bar" id="stats-bar"></div>
+      <div class="progress-wrap"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+      <div class="card-resp">
+        <div class="card-header">
+          <span class="card-header-title">Comparação questão a questão</span>
+          <span class="card-header-sub">verde = acerto · vermelho = erro</span>
+        </div>
+        <div class="questions-grid" id="resultado-grid"></div>
+      </div>
+      <div class="actions">
+        <button class="btn" onclick="voltarGabarito()">← Editar gabarito</button>
+        <button class="btn btn-primary" onclick="novaProva()">Nova prova</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var tipo = 'multipla';
+var qtd = 20;
+var respostas = {};
+var gabarito = {};
+var opcoes_mc = ['A','B','C','D','E'];
+var opcoes_ce = ['C','E'];
+
+function selectTipo(t) {
+  tipo = t;
+  document.getElementById('card-mc').classList.toggle('selected', t === 'multipla');
+  document.getElementById('card-ce').classList.toggle('selected', t === 'certo_errado');
+}
+
+function gerarCartao() {
+  qtd = parseInt(document.getElementById('qtd-input').value) || 20;
+  if (qtd < 1) qtd = 1;
+  if (qtd > 200) qtd = 200;
+  respostas = {};
+  gabarito = {};
+  var titulo = document.getElementById('titulo-input').value || 'Prova';
+  document.getElementById('titulo-badge').textContent = titulo;
+  document.getElementById('tipo-badge').textContent = tipo === 'multipla' ? 'Múltipla escolha' : 'Certo / Errado';
+  document.getElementById('qtd-badge').textContent = qtd + ' questões';
+  renderGrid('questions-grid', respostas, 'rascunho');
+  updateFilledCount();
+  showStep('step-rascunho');
+  document.getElementById('step-title').textContent = 'Cartão resposta';
+}
+
+function renderGrid(containerId, data, mode) {
+  var opts = tipo === 'multipla' ? opcoes_mc : opcoes_ce;
+  var html = '';
+  for (var i = 1; i <= qtd; i++) {
+    html += '<div class="q-row">';
+    html += '<span class="q-num">Q' + i + '</span>';
+    for (var j = 0; j < opts.length; j++) {
+      var o = opts[j];
+      var sel = data[i] === o;
+      var cls = 'opt-btn';
+      if (sel) cls += ' marked';
+      html += '<button class="' + cls + '" onclick="marcar(\'' + mode + '\', ' + i + ', \'' + o + '\')" id="btn-' + mode + '-' + i + '-' + o + '">' + o + '</button>';
+    }
+    var hasFill = data[i] ? ' filled' : '';
+    html += '<span class="q-status' + hasFill + '" id="status-' + mode + '-' + i + '"></span>';
+    html += '</div>';
+  }
+  document.getElementById(containerId).innerHTML = html;
+}
+
+function marcar(mode, q, opcao) {
+  var data = mode === 'rascunho' ? respostas : gabarito;
+  if (data[q] === opcao) {
+    delete data[q];
+  } else {
+    data[q] = opcao;
+  }
+  var opts = tipo === 'multipla' ? opcoes_mc : opcoes_ce;
+  for (var j = 0; j < opts.length; j++) {
+    var o = opts[j];
+    var btn = document.getElementById('btn-' + mode + '-' + q + '-' + o);
+    if (btn) {
+      btn.className = 'opt-btn' + (data[q] === o ? ' marked' : '');
+    }
+  }
+  var st = document.getElementById('status-' + mode + '-' + q);
+  if (st) st.className = 'q-status' + (data[q] ? ' filled' : '');
+  if (mode === 'rascunho') updateFilledCount();
+  else updateGabFilledCount();
+}
+
+function updateFilledCount() {
+  var c = Object.keys(respostas).length;
+  document.getElementById('filled-count').textContent = c + ' respondidas';
+}
+
+function updateGabFilledCount() {
+  var c = Object.keys(gabarito).length;
+  document.getElementById('gab-filled-count').textContent = c + ' informados';
+}
+
+function limparRascunho() {
+  respostas = {};
+  renderGrid('questions-grid', respostas, 'rascunho');
+  updateFilledCount();
+}
+
+function salvarRascunho() {
+  renderGrid('gabarito-grid', gabarito, 'gabarito');
+  updateGabFilledCount();
+  showStep('step-gabarito');
+  document.getElementById('step-title').textContent = 'Gabarito e resultado';
+  switchTab('gabarito');
+  document.getElementById('panel-resultado').style.display = 'none';
+}
+
+function switchTab(t) {
+  document.getElementById('tab-gabarito').className = 'tab' + (t === 'gabarito' ? ' active' : '');
+  document.getElementById('tab-resultado').className = 'tab' + (t === 'resultado' ? ' active' : '');
+  document.getElementById('panel-gabarito').style.display = t === 'gabarito' ? 'block' : 'none';
+  document.getElementById('panel-resultado').style.display = t === 'resultado' ? 'block' : 'none';
+}
+
+function calcularResultado() {
+  var acertos = 0, erros = 0, naoResp = 0;
+  var opts = tipo === 'multipla' ? opcoes_mc : opcoes_ce;
+  var html = '';
+  for (var i = 1; i <= qtd; i++) {
+    var resp = respostas[i];
+    var gab = gabarito[i];
+    html += '<div class="q-row">';
+    html += '<span class="q-num">Q' + i + '</span>';
+    for (var j = 0; j < opts.length; j++) {
+      var o = opts[j];
+      var cls = 'opt-btn';
+      if (gab && gab === o) cls += ' correct gabarito-mark';
+      else if (resp === o && resp !== gab) cls += ' wrong';
+      else if (resp === o && resp === gab) cls += ' correct';
+      html += '<button class="' + cls + '" disabled>' + o + '</button>';
+    }
+    var icon = '';
+    if (!resp) { naoResp++; icon = '<span style="font-size:11px;color:var(--color-text-secondary);margin-left:4px;">—</span>'; }
+    else if (!gab) { icon = '<span style="font-size:11px;color:var(--color-text-secondary);margin-left:4px;">?</span>'; }
+    else if (resp === gab) { acertos++; icon = '<span style="font-size:14px;color:#1D9E75;margin-left:4px;">✓</span>'; }
+    else { erros++; icon = '<span style="font-size:14px;color:#E24B4A;margin-left:4px;">✗</span>'; }
+    html += icon + '</div>';
+  }
+  document.getElementById('resultado-grid').innerHTML = html;
+  var gabInformados = Object.keys(gabarito).length;
+  var pct = gabInformados > 0 ? Math.round((acertos / gabInformados) * 100) : 0;
+  document.getElementById('stats-bar').innerHTML =
+    '<div class="stat-card"><div class="stat-label">Acertos</div><div class="stat-val green">' + acertos + '</div></div>' +
+    '<div class="stat-card"><div class="stat-label">Erros</div><div class="stat-val red">' + erros + '</div></div>' +
+    '<div class="stat-card"><div class="stat-label">Não respondidas</div><div class="stat-val">' + naoResp + '</div></div>' +
+    '<div class="stat-card"><div class="stat-label">Aproveitamento</div><div class="stat-val ' + (pct >= 60 ? 'green' : 'red') + '">' + pct + '%</div></div>';
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-fill').style.background = pct >= 60 ? '#1D9E75' : '#E24B4A';
+  switchTab('resultado');
+}
+
+function voltarGabarito() { switchTab('gabarito'); }
+function voltarConfig() { showStep('step-config'); document.getElementById('step-title').textContent = 'Configurar gabarito'; }
+function novaProva() { voltarConfig(); }
+
+function showStep(id) {
+  var steps = document.querySelectorAll('.step');
+  for (var i = 0; i < steps.length; i++) steps[i].classList.remove('active');
+  document.getElementById(id).classList.add('active');
+}
+</script>
